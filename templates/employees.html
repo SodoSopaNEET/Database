@@ -1,0 +1,69 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<form method="POST">
+    <label for="EmployeeId">身分證字號:</label>
+    <input type="text" id="EmployeeId" name="EmployeeId" required>
+    <label for="Name">姓名:</label>
+    <input type="text" id="Name" name="Name" required>
+    <label for="Rank">職等:</label>
+    <input type="text" id="Rank" name="Rank" required>
+    <label for="Salary">薪資:</label>
+    <input type="number" id="Salary" name="Salary" required>
+    <label for="Phone">電話:</label>
+    <input type="text" id="Phone" name="Phone" required>
+    <label for="Gender">性別:</label>
+    <select id="Gender" name="Gender">
+        <option value="男">男</option>
+        <option value="女">女</option>
+    </select>
+    <label for="BirthDate">出生日期:</label>
+    <input type="date" id="BirthDate" name="BirthDate" required>
+    <label for="HireDate">錄用日期:</label>
+    <input type="date" id="HireDate" name="HireDate" required>
+    <label for="address">住址:</label>
+    <input type="text" id="Address" name="Address" required>
+    <button type="submit">新增員工</button>
+</form>
+
+<h3>員工列表</h3>
+<table>
+    <tr>
+        <th>身分證字號</th>
+        <th>姓名</th>
+        <th>職等</th>
+        <th>薪資</th>
+        <th>電話</th>
+        <th>性別</th>
+        <th>出生日期</th>
+        <th>錄用日期</th>
+        <th>住址</th>
+        <th>狀態</th>
+        <th>操作</th>
+    </tr>
+    {% for employee in employees %}
+    <tr>
+        <td>{{ employee.EmployeeID }}</td>
+        <td>{{ employee.Name }}</td>
+        <td>{{ employee.Rank }}</td>
+        <td>{{ employee.Salary }}</td>
+        <td>{{ employee.Phone }}</td>
+        <td>{{ employee.Gender }}</td>
+        <td>{{ employee.BirthDate }}</td>
+        <td>{{ employee.HireDate }}</td>
+        <td>{{ employee.Address }}</td>
+        <td>{{ employee.Status }}</td>
+        <td>
+            <!-- 修改功能 -->
+            <a href="{{ url_for('edit_employee', employee_id=employee.EmployeeID) }}" class="btn btn-primary">修改</a>
+
+            <!-- 刪除功能 -->
+            <form action="{{ url_for('delete_employee', employee_id=employee.EmployeeID) }}" method="POST" style="display:inline;">
+                <button type="submit" class="btn btn-danger">刪除</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

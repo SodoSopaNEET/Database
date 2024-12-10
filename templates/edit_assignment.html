@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>修改派駐資料</title>
+</head>
+<body>
+    <h2>修改派駐資料</h2>
+    <form method="POST">
+        <label for="CountryCode">派駐國家代碼:</label>
+        <input type="text" id="CountryCode" name="CountryCode" value="{{ assignment.CountryCode }}" required>
+
+        <label for="StartDate">到職日期:</label>
+        <input type="date" id="StartDate" name="StartDate" value="{{ assignment.StartDate }}" required>
+
+        <label for="Ambassador">大使姓名:</label>
+        <input type="text" id="Ambassador" name="Ambassador" value="{{ assignment.Ambassador }}" required>
+
+        <label for="Status">派駐狀態:</label>
+        <select id="Status" name="Status">
+            <option value="正常" {% if assignment.Status == '正常' %}selected{% endif %}>正常</option>
+            <option value="離職" {% if assignment.Status == '離職' %}selected{% endif %}>離職</option>
+        </select>
+
+        <button type="submit">保存修改</button>
+    </form>
+</body>
+</html>

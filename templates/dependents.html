@@ -1,0 +1,54 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<h2>眷屬管理</h2>
+<form method="POST">
+    <label for="EmployeeID">員工編號:</label>
+    <input type="text" id="EmployeeID" name="EmployeeID" required>
+    <label for="DependentID">眷屬身分證字號:</label>
+    <input type="text" id="DependentID" name="DependentID" required>
+    <label for="DependentName">眷屬姓名:</label>
+    <input type="text" id="DependentName" name="DependentName" required>
+    <label for="Gender">性別:</label>
+    <input type="text" id="Gender" name="Gender" required>
+    <label for="Relation">關係:</label>
+    <input type="text" id="Relation" name="Relation" required>
+    <label for="BirthDate">出生日期:</label>
+    <input type="date" id="BirthDate" name="BirthDate" required>
+    <button type="submit" class="btn btn-primary">新增眷屬</button>
+</form>
+
+<h3>眷屬列表</h3>
+<table>
+    <tr>
+        <th>員工編號</th>
+        <th>眷屬身分證字號</th>
+        <th>眷屬姓名</th>
+        <th>性別</th>
+        <th>關係</th>
+        <th>出生日期</th>
+        <th>狀態</th>
+        <th>操作</th>
+    </tr>
+    {% for dependent in dependents %}
+    <tr>
+        <td>{{ dependent.EmployeeID }}</td>
+        <td>{{ dependent.DependentID }}</td>
+        <td>{{ dependent.DependentName }}</td>
+        <td>{{ dependent.Gender }}</td>
+        <td>{{ dependent.Relation }}</td>
+        <td>{{ dependent.BirthDate }}</td>
+        <td>{{ dependent.Status }}</td>
+        <td>
+            <!-- 修改功能 -->
+            <a href="{{ url_for('edit_dependent', employee_id=dependent.EmployeeID, dependent_id=dependent.DependentID) }}" class="btn btn-primary btn-sm">修改</a>
+
+            <!-- 刪除功能 -->
+            <form action="{{ url_for('delete_dependent', employee_id=dependent.EmployeeID, dependent_id=dependent.DependentID) }}" method="POST" style="display:inline;">
+                <button type="submit" class="btn btn-danger btn-sm">刪除</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

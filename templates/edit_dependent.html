@@ -1,0 +1,34 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<h2>修改眷屬資料</h2>
+
+<form method="POST">
+    <label for="EmployeeID">員工編號:</label>
+    <input type="text" id="EmployeeID" name="EmployeeID" value="{{ dependent.EmployeeID }}" readonly>
+
+    <label for="DependentID">眷屬身分證字號:</label>
+    <input type="text" id="DependentID" name="DependentID" value="{{ dependent.DependentID }}" readonly>
+
+    <label for="DependentName">眷屬姓名:</label>
+    <input type="text" id="DependentName" name="DependentName" value="{{ dependent.DependentName }}" required>
+
+    <label for="Gender">性別:</label>
+    <input type="text" id="Gender" name="Gender" value="{{ dependent.Gender }}" required>
+
+    <label for="Relation">關係:</label>
+    <input type="text" id="Relation" name="Relation" value="{{ dependent.Relation }}" required>
+
+    <label for="BirthDate">出生日期:</label>
+    <input type="date" id="BirthDate" name="BirthDate" value="{{ dependent.BirthDate }}" required>
+
+    <label for="Status">狀態:</label>
+    <select id="Status" name="Status" required>
+        <option value="正常" {% if dependent.Status == '正常' %}selected{% endif %}>正常</option>
+        <option value="已刪除" {% if dependent.Status == '已刪除' %}selected{% endif %}>已刪除</option>
+    </select>
+
+    <button type="submit" class="btn btn-primary">保存修改</button>
+    <a href="{{ url_for('manage_dependents') }}" class="btn btn-secondary">取消</a>
+</form>
+{% endblock %}

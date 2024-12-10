@@ -1,0 +1,46 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<h2>修改員工資料</h2>
+
+<form method="POST">
+    <label for="EmployeeId">身分證字號:</label>
+    <input type="text" id="EmployeeId" name="EmployeeId" value="{{ employee.EmployeeID }}" readonly>
+
+    <label for="Name">姓名:</label>
+    <input type="text" id="Name" name="Name" value="{{ employee.Name }}" required>
+
+    <label for="Rank">職等:</label>
+    <input type="text" id="Rank" name="Rank" value="{{ employee.Rank }}" required>
+
+    <label for="Salary">薪資:</label>
+    <input type="number" id="Salary" name="Salary" value="{{ employee.Salary }}" required>
+
+    <label for="Phone">電話:</label>
+    <input type="text" id="Phone" name="Phone" value="{{ employee.Phone }}" required>
+
+    <label for="Gender">性別:</label>
+    <select id="Gender" name="Gender" required>
+        <option value="男" {% if employee.Gender == '男' %}selected{% endif %}>男</option>
+        <option value="女" {% if employee.Gender == '女' %}selected{% endif %}>女</option>
+    </select>
+
+    <label for="BirthDate">出生日期:</label>
+    <input type="date" id="BirthDate" name="BirthDate" value="{{ employee.BirthDate }}" required>
+
+    <label for="HireDate">錄用日期:</label>
+    <input type="date" id="HireDate" name="HireDate" value="{{ employee.HireDate }}" required>
+
+    <label for="Address">住址:</label>
+    <input type="text" id="Address" name="Address" value="{{ employee.Address }}" required>
+
+    <label for="Status">狀態:</label>
+    <select id="Status" name="Status" required>
+        <option value="正常" {% if employee.Status == '正常' %}selected{% endif %}>正常</option>
+        <option value="離職" {% if employee.Status == '離職' %}selected{% endif %}>離職</option>
+    </select>
+
+    <button type="submit" class="btn btn-primary">保存修改</button>
+    <a href="{{ url_for('manage_employees') }}" class="btn btn-secondary">取消</a>
+</form>
+{% endblock %}

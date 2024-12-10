@@ -1,0 +1,68 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<h2>派駐管理</h2>
+
+<!-- 錯誤消息顯示 -->
+{% if error_message %}
+<div class="alert alert-danger">
+    {{ error_message }}
+</div>
+{% endif %}
+
+<form method="POST">
+    <label for="EmployeeID">員工身分證字號:</label>
+    <input type="text" id="EmployeeID" name="EmployeeID" required>
+    <label for="EmployeeName">員工姓名:</label>
+    <input type="text" id="EmployeeName" name="EmployeeName" required>
+    <label for="CountryCode">派駐國家代碼:</label>
+    <input type="text" id="CountryCode" name="CountryCode" required>
+    <label for="StartDate">到職日期:</label>
+    <input type="date" id="StartDate" name="StartDate" required>
+    <label for="Ambassador">大使姓名:</label>
+    <input type="text" id="Ambassador" name="Ambassador" required>
+    <label for="status">派駐狀態:</label>
+    <select id="Status" name="Status">
+        <option value="正常">正常</option>
+        <option value="調離原職">調離原職</option>
+        <option value="離職">離職</option>
+    </select>
+    <button type="submit">新增派駐資料</button>
+</form>
+
+<h3>派駐列表</h3>
+<table>
+    <thead>
+        <tr>
+            <th>員工身分證字號</th>
+            <th>員工姓名</th>
+            <th>派駐國家代碼</th>
+            <th>到職日期</th>
+            <th>大使姓名</th>
+            <th>派駐狀態</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for assignment in assignments %}
+        <tr>
+            <td>{{ assignment.EmployeeID }}</td>
+            <td>{{ assignment.EmployeeName }}</td>
+            <td>{{ assignment.CountryCode }}</td>
+            <td>{{ assignment.StartDate }}</td>
+            <td>{{ assignment.Ambassador }}</td>
+            <td>{{ assignment.Status }}</td>
+            <td>
+                <!-- 修改 -->
+                <a href="{{ url_for('edit_assignment', employee_id=assignment.EmployeeID, country_code=assignment.CountryCode) }}" class="btn btn-primary">修改</a>
+
+                <!-- 刪除 -->
+                <form action="{{ url_for('delete_assignment', employee_id=assignment.EmployeeID, country_code=assignment.CountryCode) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-danger">刪除</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

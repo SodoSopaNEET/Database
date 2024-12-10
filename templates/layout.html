@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>員工外派資訊系統</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>員工外派資訊系統</h1>
+            <nav>
+                <ul>
+                    <li><a href="/">首頁</a></li>
+                    <li><a href="/employees">員工管理</a></li>
+                    <li><a href="/countries">國家管理</a></li>
+                    <li><a href="/assignments">派駐管理</a></li>
+                    <li><a href="/dependents">眷屬管理</a></li>
+                </ul>
+            </nav>
+
+    </header>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

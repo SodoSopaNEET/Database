@@ -1,0 +1,42 @@
+<h2>修改國家資料</h2>
+<form method="POST">
+    <!-- 其他欄位 -->
+    <label for="CountryName">國家名稱:</label>
+    <input type="text" id="CountryName" name="CountryName" value="{{ country.CountryName }}" required>
+
+    <label for="Continent">所屬洲名:</label>
+    <input type="text" id="Continent" name="Continent" value="{{ country.Continent }}" required>
+
+    <label for="HeadOfState">元首姓名:</label>
+    <input type="text" id="HeadOfState" name="HeadOfState" value="{{ country.HeadOfState }}" required>
+
+    <label for="ForeignMinister">外交部長姓名:</label>
+    <input type="text" id="ForeignMinister" name="ForeignMinister" value="{{ country.ForeignMinister }}" required>
+
+    <label for="ContactPerson">聯絡人姓名:</label>
+    <input type="text" id="ContactPerson" name="ContactPerson" value="{{ country.ContactPerson }}" required>
+
+    <label for="Population">人口數:</label>
+    <input type="number" id="Population" name="Population" value="{{ country.Population }}" required>
+
+    <label for="Area">領土面積:</label>
+    <input type="number" id="Area" name="Area" value="{{ country.Area }}" required>
+
+    <label for="Phone">聯絡電話:</label>
+    <input type="text" id="Phone" name="Phone" value="{{ country.Phone }}" required>
+
+    <label for="IsAlly">是否為邦交國:</label>
+    <select id="IsAlly" name="IsAlly">
+        <option value="是" {% if country.IsAlly %}selected{% endif %}>是</option>
+        <option value="否" {% if not country.IsAlly %}selected{% endif %}>否</option>
+    </select>
+
+    <!-- 狀態欄位改為下拉式選單 -->
+    <label for="Status">國家存在狀態:</label>
+    <select id="Status" name="Status" required>
+        <option value="正常" {% if country.Status == '正常' %}selected{% endif %}>正常</option>
+        <option value="亡國" {% if country.Status == '亡國' %}selected{% endif %}>亡國</option>
+    </select>
+
+    <button type="submit">保存修改</button>
+</form>

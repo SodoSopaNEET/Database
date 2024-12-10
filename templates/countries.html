@@ -1,0 +1,80 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<h2>國家管理</h2>
+<form method="POST">
+    <label for="CountryCode">國家代碼:</label>
+    <input type="text" id="CountryCode" name="CountryCode" required>
+    <label for="CountryName">國家名稱:</label>
+    <input type="text" id="CountryName" name="CountryName" required>
+    <label for="Continent">所屬洲名:</label>
+    <input type="text" id="Continent" name="Continent" required>
+    <label for="HeadOfState">元首姓名:</label>
+    <input type="text" id="HeadOfState" name="HeadOfState" required>
+    <label for="ForeignMinister">外交部長姓名:</label>
+    <input type="text" id="ForeignMinister" name="ForeignMinister" required>
+    <label for="ContactPerson">聯絡人姓名:</label>
+    <input type="text" id="ContactPerson" name="ContactPerson" required>
+    <label for="Population">人口數:</label>
+    <input type="number" id="Population" name="Population" required>
+    <label for="Area">領土面積 (平方公里):</label>
+    <input type="number" id="Area" name="Area" required>
+    <label for="Phone">聯絡電話:</label>
+    <input type="text" id="Phone" name="Phone" required>
+    <label for="IsAlly">是否為邦交國:</label>
+    <select id="IsAlly" name="IsAlly">
+        <option value="1">是</option>
+        <option value="0">否</option>
+    </select>
+    <button type="submit">新增國家</button>
+</form>
+
+
+<h3>國家列表</h3>
+<table>
+    <thead>
+        <tr>
+            <th>國家代碼</th>
+            <th>國家名稱</th>
+            <th>所屬洲名</th>
+            <th>元首姓名</th>
+            <th>外交部長姓名</th>
+            <th>聯絡人姓名</th>
+            <th>人口數</th>
+            <th>領土面積</th>
+            <th>聯絡電話</th>
+            <th>是否為邦交國</th>
+            <th>狀態</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for country in countries %}
+        <tr>
+            <td>{{ country.CountryCode }}</td>
+            <td>{{ country.CountryName }}</td>
+            <td>{{ country.Continent }}</td>
+            <td>{{ country.HeadOfState }}</td>
+            <td>{{ country.ForeignMinister }}</td>
+            <td>{{ country.ContactPerson }}</td>
+            <td>{{ country.Population }}</td>
+            <td>{{ country.Area }}</td>
+            <td>{{ country.Phone }}</td>
+            <td>{{ '是' if country.IsAlly else '否' }}</td>
+            <td>{{ country.Status }}</td>
+            <td>
+                <!-- 修改按鈕 -->
+                <a href="{{ url_for('edit_country', country_code=country.CountryCode) }}" class="btn btn-primary btn-sm">修改</a>
+
+                <!-- 刪除按鈕 -->
+                <form action="{{ url_for('delete_country', country_code=country.CountryCode) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-danger btn-sm">刪除</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+{% endblock %}
