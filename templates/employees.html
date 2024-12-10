@@ -1,6 +1,25 @@
 {% extends 'layout.html' %}
 
 {% block content %}
+<!-- 查詢功能 -->
+<form method="GET" action="{{ url_for('manage_employees') }}">
+    <label for="query_field">查詢條件:</label>
+    <select id="query_field" name="query_field">
+        <option value="EmployeeID">身分證字號</option>
+        <option value="Name">姓名</option>
+        <option value="Rank">職等</option>
+        <option value="Salary">薪資</option>
+        <option value="Phone">電話</option>
+        <option value="Gender">性別</option>
+        <option value="BirthDate">出生日期</option>
+        <option value="HireDate">錄用日期</option>
+        <option value="Address">住址</option>
+    </select>
+    <input type="text" id="query_value" name="query_value" placeholder="請輸入查詢內容">
+    <button type="submit" class="btn btn-primary">查詢</button>
+</form>
+
+<!-- 新增員工表單 -->
 <form method="POST">
     <label for="EmployeeId">身分證字號:</label>
     <input type="text" id="EmployeeId" name="EmployeeId" required>
@@ -21,11 +40,12 @@
     <input type="date" id="BirthDate" name="BirthDate" required>
     <label for="HireDate">錄用日期:</label>
     <input type="date" id="HireDate" name="HireDate" required>
-    <label for="address">住址:</label>
+    <label for="Address">住址:</label>
     <input type="text" id="Address" name="Address" required>
-    <button type="submit">新增員工</button>
+    <button type="submit" class="btn btn-success">新增員工</button>
 </form>
 
+<!-- 員工列表 -->
 <h3>員工列表</h3>
 <table>
     <tr>
@@ -55,7 +75,9 @@
         <td>{{ employee.Status }}</td>
         <td>
             <!-- 修改功能 -->
-            <a href="{{ url_for('edit_employee', employee_id=employee.EmployeeID) }}" class="btn btn-primary">修改</a>
+            <form action="{{ url_for('edit_employee', employee_id=employee.EmployeeID) }}" method="GET" style="display:inline;">
+                <button type="submit" class="btn btn-primary">修改</button>
+            </form>
 
             <!-- 刪除功能 -->
             <form action="{{ url_for('delete_employee', employee_id=employee.EmployeeID) }}" method="POST" style="display:inline;">

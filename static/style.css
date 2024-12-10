@@ -88,3 +88,55 @@ table tr:nth-child(even) {
 table tr:hover {
     background-color: #444;
 }
+/* 按鈕樣式統一 */
+button.btn {
+    display: inline-block;
+    text-align: center;
+    padding: 8px 16px; /* 內邊距 */
+    font-size: 14px; /* 字體大小 */
+    border-radius: 5px; /* 圓角 */
+    border: none; /* 去掉邊框 */
+    cursor: pointer;
+    width: 100px; /* 固定寬度，確保所有按鈕一致 */
+    color: #fff; /* 按鈕文字顏色 */
+}
+
+button.btn-primary {
+    background-color: #007bff; /* 修改按鈕顏色 */
+}
+
+button.btn-danger {
+    background-color: #dc3545; /* 刪除按鈕顏色 */
+}
+
+button.btn-primary:hover {
+    background-color: #0056b3; /* 修改按鈕滑過效果 */
+}
+
+button.btn-danger:hover {
+    background-color: #a71d2a; /* 刪除按鈕滑過效果 */
+}
+
+
+form label {
+    display: inline-block;
+    font-weight: bold;
+    margin-bottom: 0; /* 去除下方空白 */
+    margin-right: 5px; /* 减少右侧空白 */
+    text-align: right; /* 确保标签文字对齐 */
+    width: auto; /* 保持自适应宽度 */
+}
+
+form input, form select {
+    display: inline-block;
+    padding: 5px; /* 保持输入框内部间距 */
+    margin: 0; /* 去除输入框外部间距 */
+    border: 1px solid #444;
+    border-radius: 5px;
+    background-color: #333;
+    color: #fff;
+    width: 250px; /* 保证宽度一致 */
+    box-sizing: border-box; /* 确保宽度包含内边距和边框 */
+}
+
+

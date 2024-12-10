@@ -38,7 +38,18 @@ def manage_employees():
         db.commit()
         return redirect(url_for('manage_employees'))
 
-    cursor.execute("SELECT * FROM employee WHERE status='正常'")
+    # 查詢功能
+    query_field = request.args.get('query_field')
+    query_value = request.args.get('query_value')
+
+    if query_field and query_value:
+        # 使用 LIKE 支持模糊查詢
+        query = f"SELECT * FROM employee WHERE {query_field} LIKE %s AND status='正常'"
+        cursor.execute(query, (f"%{query_value}%",))
+    else:
+        # 顯示所有正常的員工
+        cursor.execute("SELECT * FROM employee WHERE status='正常'")
+
     employees = cursor.fetchall()
     return render_template('employees.html', employees=employees)
 
@@ -60,7 +71,7 @@ def edit_employee(employee_id):
         # 更新數據
         cursor.execute("""
             UPDATE employee
-            SET Name = %s, Rank = %s, Salary = %s, Phone = %s, Gender = %s,
+            SET Name = %s, `Rank` = %s, Salary = %s, Phone = %s, Gender = %s,
                 BirthDate = %s, HireDate = %s, Address = %s, Status = %s
             WHERE EmployeeID = %s
         """, (name, rank, salary, phone, gender, birth_date, hire_date, address, status, employee_id))
@@ -105,8 +116,18 @@ def manage_countries():
         db.commit()
         return redirect(url_for('manage_countries'))
 
-    # 查詢國家資料
-    cursor.execute("SELECT * FROM country WHERE Status='正常'")
+    # 查詢功能
+    query_field = request.args.get('query_field')
+    query_value = request.args.get('query_value')
+
+    if query_field and query_value:
+        # 使用 LIKE 支持模糊查詢
+        query = f"SELECT * FROM country WHERE {query_field} LIKE %s AND Status='正常'"
+        cursor.execute(query, (f"%{query_value}%",))
+    else:
+        # 顯示所有正常的國家
+        cursor.execute("SELECT * FROM country WHERE Status='正常'")
+
     countries = cursor.fetchall()
     return render_template('countries.html', countries=countries)
 
@@ -154,6 +175,7 @@ def delete_country(country_code):
 @app.route('/dependents', methods=['GET', 'POST'])
 def manage_dependents():
     cursor = db.cursor(dictionary=True)
+
     if request.method == 'POST':
         # 新增眷屬資料
         employee_id = request.form['EmployeeID']
@@ -171,8 +193,18 @@ def manage_dependents():
         db.commit()
         return redirect(url_for('manage_dependents'))
 
-    # 查詢所有狀態為正常的眷屬資料
-    cursor.execute("SELECT * FROM dependent WHERE Status='正常'")
+    # 查詢功能
+    query_field = request.args.get('query_field')
+    query_value = request.args.get('query_value')
+
+    if query_field and query_value:
+        # 使用 LIKE 支持模糊查詢
+        query = f"SELECT * FROM dependent WHERE {query_field} LIKE %s AND Status='正常'"
+        cursor.execute(query, (f"%{query_value}%",))
+    else:
+        # 顯示所有正常的眷屬資料
+        cursor.execute("SELECT * FROM dependent WHERE Status='正常'")
+
     dependents = cursor.fetchall()
     return render_template('dependents.html', dependents=dependents)
 

@@ -53,14 +53,17 @@
             <td>{{ assignment.Ambassador }}</td>
             <td>{{ assignment.Status }}</td>
             <td>
-                <!-- 修改 -->
-                <a href="{{ url_for('edit_assignment', employee_id=assignment.EmployeeID, country_code=assignment.CountryCode) }}" class="btn btn-primary">修改</a>
+                <!-- 修改按鈕 -->
+                <form action="{{ url_for('edit_assignment', employee_id=assignment.EmployeeID, country_code=assignment.CountryCode) }}" method="GET" style="display:inline;">
+                    <button type="submit" class="btn btn-primary">修改</button>
+                </form>
 
-                <!-- 刪除 -->
+                <!-- 刪除按鈕 -->
                 <form action="{{ url_for('delete_assignment', employee_id=assignment.EmployeeID, country_code=assignment.CountryCode) }}" method="POST" style="display:inline;">
                     <button type="submit" class="btn btn-danger">刪除</button>
                 </form>
             </td>
+
         </tr>
         {% endfor %}
     </tbody>

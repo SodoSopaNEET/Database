@@ -2,8 +2,21 @@
 
 {% block content %}
 <h2>眷屬管理</h2>
+
+<!-- 查詢功能 -->
+<form method="GET" action="{{ url_for('manage_dependents') }}">
+    <label for="query_field">查詢條件:</label>
+    <select id="query_field" name="query_field">
+        <option value="EmployeeID">員工身分證字號</option>
+        <option value="DependentID">眷屬身分證字號</option>
+    </select>
+    <input type="text" id="query_value" name="query_value" placeholder="請輸入查詢內容">
+    <button type="submit" class="btn btn-primary">查詢</button>
+</form>
+
+<!-- 新增眷屬功能 -->
 <form method="POST">
-    <label for="EmployeeID">員工編號:</label>
+    <label for="EmployeeID">員工身分證字號:</label>
     <input type="text" id="EmployeeID" name="EmployeeID" required>
     <label for="DependentID">眷屬身分證字號:</label>
     <input type="text" id="DependentID" name="DependentID" required>
@@ -18,10 +31,11 @@
     <button type="submit" class="btn btn-primary">新增眷屬</button>
 </form>
 
+<!-- 眷屬列表 -->
 <h3>眷屬列表</h3>
 <table>
     <tr>
-        <th>員工編號</th>
+        <th>員工身分證字號</th>
         <th>眷屬身分證字號</th>
         <th>眷屬姓名</th>
         <th>性別</th>
@@ -41,7 +55,9 @@
         <td>{{ dependent.Status }}</td>
         <td>
             <!-- 修改功能 -->
-            <a href="{{ url_for('edit_dependent', employee_id=dependent.EmployeeID, dependent_id=dependent.DependentID) }}" class="btn btn-primary btn-sm">修改</a>
+            <form action="{{ url_for('edit_dependent', employee_id=dependent.EmployeeID, dependent_id=dependent.DependentID) }}" method="GET" style="display:inline;">
+                <button type="submit" class="btn btn-primary btn-sm">修改</button>
+            </form>
 
             <!-- 刪除功能 -->
             <form action="{{ url_for('delete_dependent', employee_id=dependent.EmployeeID, dependent_id=dependent.DependentID) }}" method="POST" style="display:inline;">
