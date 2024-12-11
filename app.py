@@ -18,6 +18,8 @@ db = mysql.connector.connect(**db_config)
 @app.route('/employees', methods=['GET', 'POST'])
 def manage_employees():
     cursor = db.cursor(dictionary=True)
+    error_message = None  # 用於顯示錯誤訊息
+
     if request.method == 'POST':
         # 新增員工
         employee_id = request.form['EmployeeId']
@@ -29,14 +31,27 @@ def manage_employees():
         birth_date = request.form['BirthDate']
         hire_date = request.form['HireDate']
         address = request.form['Address']
-        cursor.execute(
-            "INSERT INTO employee (EmployeeID, Name, `Rank`, Salary, Phone, Gender, BirthDate, HireDate, Address) "
-            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
-            (employee_id, name, rank, salary, phone, gender, birth_date, hire_date, address)
-        )
 
-        db.commit()
-        return redirect(url_for('manage_employees'))
+        # 檢查是否已存在相同身分證字號的記錄
+        cursor.execute("SELECT * FROM employee WHERE EmployeeID = %s", (employee_id,))
+        existing_employee = cursor.fetchone()
+
+        if existing_employee:
+            # 如果存在，顯示錯誤訊息
+            error_message = f"身分證字號 {employee_id} 已存在，無法重複新增！"
+        else:
+            try:
+                # 插入新員工記錄
+                cursor.execute(
+                    "INSERT INTO employee (EmployeeID, Name, `Rank`, Salary, Phone, Gender, BirthDate, HireDate, Address) "
+                    "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                    (employee_id, name, rank, salary, phone, gender, birth_date, hire_date, address)
+                )
+                db.commit()
+                return redirect(url_for('manage_employees'))
+            except Exception as e:
+                # 捕捉任何其他異常
+                error_message = f"新增員工時發生錯誤：{str(e)}"
 
     # 查詢功能
     query_field = request.args.get('query_field')
@@ -51,7 +66,8 @@ def manage_employees():
         cursor.execute("SELECT * FROM employee WHERE status='正常'")
 
     employees = cursor.fetchall()
-    return render_template('employees.html', employees=employees)
+    return render_template('employees.html', employees=employees, error_message=error_message)
+
 
 @app.route('/employees/edit/<employee_id>', methods=['GET', 'POST'])
 def edit_employee(employee_id):
@@ -95,6 +111,8 @@ def delete_employee(employee_id):
 @app.route('/countries', methods=['GET', 'POST'])
 def manage_countries():
     cursor = db.cursor(dictionary=True)
+    error_message = None  # 用於顯示錯誤訊息
+
     if request.method == 'POST':
         # 新增國家資料
         country_code = request.form['CountryCode']
@@ -108,13 +126,27 @@ def manage_countries():
         phone = request.form['Phone']
         is_ally = request.form['IsAlly']
         status = '正常'
-        cursor.execute(
-            "INSERT INTO country (CountryCode, CountryName, Continent, HeadOfState, ForeignMinister, ContactPerson, Population, Area, Phone, IsAlly, Status) "
-            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-            (country_code, country_name, continent, head_of_state, foreign_minister, contact_person, population, area, phone, is_ally, status)
-        )
-        db.commit()
-        return redirect(url_for('manage_countries'))
+
+        # 檢查是否已存在相同國家代碼的記錄
+        cursor.execute("SELECT * FROM country WHERE CountryCode = %s", (country_code,))
+        existing_country = cursor.fetchone()
+
+        if existing_country:
+            # 如果存在，顯示錯誤訊息
+            error_message = f"國家代碼 {country_code} 已存在，無法重複新增！"
+        else:
+            try:
+                # 插入新國家記錄
+                cursor.execute(
+                    "INSERT INTO country (CountryCode, CountryName, Continent, HeadOfState, ForeignMinister, ContactPerson, Population, Area, Phone, IsAlly, Status) "
+                    "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                    (country_code, country_name, continent, head_of_state, foreign_minister, contact_person, population, area, phone, is_ally, status)
+                )
+                db.commit()
+                return redirect(url_for('manage_countries'))
+            except Exception as e:
+                # 捕捉任何其他異常
+                error_message = f"新增國家時發生錯誤：{str(e)}"
 
     # 查詢功能
     query_field = request.args.get('query_field')
@@ -129,7 +161,8 @@ def manage_countries():
         cursor.execute("SELECT * FROM country WHERE Status='正常'")
 
     countries = cursor.fetchall()
-    return render_template('countries.html', countries=countries)
+    return render_template('countries.html', countries=countries, error_message=error_message)
+
 
 
 @app.route('/countries/edit/<country_code>', methods=['GET', 'POST'])
@@ -256,26 +289,36 @@ def manage_assignments():
     error_message = None
 
     if request.method == 'POST':
-        try:
-            # 從表單獲取數據
-            employee_id = request.form.get('EmployeeID')
-            country_code = request.form.get('CountryCode')
-            start_date = request.form.get('StartDate')
-            ambassador = request.form.get('Ambassador')
-            status = request.form.get('Status')
+        # 從表單獲取數據
+        employee_id = request.form.get('EmployeeID')
+        country_code = request.form.get('CountryCode')
+        start_date = request.form.get('StartDate')
+        ambassador = request.form.get('Ambassador')
+        status = request.form.get('Status')
 
-            # 插入數據
-            cursor.execute("""
-                INSERT INTO assignment (EmployeeID, CountryCode, StartDate, Ambassador, Status)
-                VALUES (%s, %s, %s, %s, %s)
-            """, (employee_id, country_code, start_date, ambassador, status))
-            db.commit()
-            return redirect(url_for('manage_assignments'))
+        # 檢查該員工是否已被派駐至其他國家且狀態為“正常”
+        cursor.execute("""
+            SELECT * FROM assignment
+            WHERE EmployeeID = %s AND Status = '正常'
+        """, (employee_id,))
+        existing_assignment = cursor.fetchone()
 
-        except IntegrityError as e:
-            # 捕獲 IntegrityError 並檢查是否是重複鍵錯誤
-            if e.errno == 1062:  # Duplicate entry
-                error_message = "該員工已經被派駐至其他國家，無法同時派駐多個國家！"
+        if existing_assignment:
+            # 如果找到符合條件的派駐記錄，返回錯誤訊息
+            error_message = f"員工 {employee_id} 已被派駐至國家代碼 {existing_assignment['CountryCode']}，無法同時派駐多個國家！"
+        else:
+            try:
+                # 插入新派駐記錄
+                cursor.execute("""
+                    INSERT INTO assignment (EmployeeID, CountryCode, StartDate, Ambassador, Status)
+                    VALUES (%s, %s, %s, %s, %s)
+                """, (employee_id, country_code, start_date, ambassador, status))
+                db.commit()
+                return redirect(url_for('manage_assignments'))
+            except IntegrityError as e:
+                # 捕獲 IntegrityError 並檢查是否是重複鍵錯誤
+                if e.errno == 1062:  # Duplicate entry
+                    error_message = "該員工已經被派駐至其他國家，無法同時派駐多個國家！"
 
     # 獲取所有派駐資料
     cursor.execute("""
@@ -287,6 +330,7 @@ def manage_assignments():
     assignments = cursor.fetchall()
 
     return render_template('assignments.html', assignments=assignments, error_message=error_message)
+
 
 @app.route('/assignments/edit/<employee_id>/<country_code>', methods=['GET', 'POST'])
 def edit_assignment(employee_id, country_code):
@@ -325,4 +369,5 @@ def index():
 
 if __name__ == '__main__':
     app.run(host='10.147.19.10', port=5000, debug=True)
+    
 

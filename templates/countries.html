@@ -3,6 +3,13 @@
 {% block content %}
 <h2>國家管理</h2>
 
+<!-- 錯誤訊息 -->
+{% if error_message %}
+<div class="alert alert-danger">
+    {{ error_message }}
+</div>
+{% endif %}
+
 <!-- 查詢功能 -->
 <form method="GET" action="{{ url_for('manage_countries') }}">
     <label for="query_field">查詢條件:</label>
@@ -95,7 +102,6 @@
                     <button type="submit" class="btn btn-danger btn-sm">刪除</button>
                 </form>
             </td>
-
         </tr>
         {% endfor %}
     </tbody>
