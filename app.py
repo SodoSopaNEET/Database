@@ -432,7 +432,7 @@ def statistics():
     return render_template('statistics.html', result=result)
 
 
-    return render_template('statistics.html', result=result)
+
 @app.route('/statistics/query/continent', methods=['GET'])
 def query_continent():
     # 獲取查詢參數
