@@ -401,7 +401,7 @@ def statistics():
                   AND a.Status = '正常'
             """, (continent,))
             result = cursor.fetchone()
-            result = f"派駐於 {continent} 洲的員工總數為 {result['employee_count']} 人。"
+            result = f"派駐於 {continent} 的員工總數為 {result['employee_count']} 人。"
 
         elif query_type == 'average_dependent_age':
             cursor.execute("""
