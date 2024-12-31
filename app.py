@@ -448,9 +448,9 @@ def query_continent():
     result = cursor.fetchone()
     # 返回查詢結果
     if result and result['EmployeeCount'] is not None:
-        return render_template('statistics.html', result=f"派駐於 {continent} 洲的員工總數為 {result['EmployeeCount']} 人。")
+        return render_template('statistics.html', result=f"派駐於 {continent} 的員工總數為 {result['EmployeeCount']} 人。")
     else:
-        return render_template('statistics.html', result=f"查無派駐於 {continent} 洲的員工數據。")
+        return render_template('statistics.html', result=f"查無派駐於 {continent} 的員工數據。")
 
 
 # 首頁
