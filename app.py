@@ -331,6 +331,13 @@ def manage_assignments():
 
     return render_template('assignments.html', assignments=assignments, error_message=error_message)
 
+@app.route('/employees/options', methods=['GET'])
+def get_employee_options():
+    cursor = db.cursor(dictionary=True)
+    # 獲取所有正常的員工身份證字號和姓名
+    cursor.execute("SELECT EmployeeID, Name FROM employee WHERE Status = '正常'")
+    employees = cursor.fetchall()
+    return jsonify(employees)
 
 @app.route('/assignments/edit/<employee_id>/<country_code>', methods=['GET', 'POST'])
 def edit_assignment(employee_id, country_code):
@@ -360,6 +367,90 @@ def delete_assignment(employee_id, country_code):
     )
     db.commit()
     return redirect(url_for('manage_assignments'))
+
+
+@app.route('/statistics', methods=['GET', 'POST'])
+def statistics():
+    cursor = db.cursor(dictionary=True)
+    result = None
+
+    if request.method == 'POST':
+        query_type = request.form.get('query_type')
+
+        if query_type == 'country_30_above':
+            country = request.form.get('country')
+            cursor.execute("""
+                SELECT COUNT(*) AS employee_count
+                FROM employee e
+                JOIN assignment a ON e.EmployeeID = a.EmployeeID
+                WHERE a.CountryCode = (SELECT CountryCode FROM country WHERE CountryName = %s)
+                  AND TIMESTAMPDIFF(YEAR, e.BirthDate, CURDATE()) > 30
+                  AND a.Status = '正常'
+            """, (country,))
+            result = cursor.fetchone()
+            result = f"派駐於 {country} 且年齡超過30歲的員工人數為 {result['employee_count']} 人。"
+
+        elif query_type == 'continent_employee_count':
+            continent = request.form.get('continent')
+            cursor.execute("""
+                SELECT COUNT(DISTINCT a.EmployeeID) AS employee_count
+                FROM employee e
+                JOIN assignment a ON e.EmployeeID = a.EmployeeID
+                JOIN country c ON a.CountryCode = c.CountryCode
+                WHERE c.Continent = %s
+                  AND a.Status = '正常'
+            """, (continent,))
+            result = cursor.fetchone()
+            result = f"派駐於 {continent} 洲的員工總數為 {result['employee_count']} 人。"
+
+        elif query_type == 'average_dependent_age':
+            cursor.execute("""
+                SELECT AVG(TIMESTAMPDIFF(YEAR, d.BirthDate, CURDATE())) AS avg_age
+                FROM dependent d
+                JOIN employee e ON d.EmployeeID = e.EmployeeID
+                WHERE TIMESTAMPDIFF(YEAR, e.BirthDate, CURDATE()) > 30
+                  AND d.Status = '正常'
+            """)
+            result = cursor.fetchone()
+            result = f"30歲以上員工的平均眷屬年齡為 {result['avg_age']:.2f} 歲。"
+
+        elif query_type == 'average_dependent_count':
+            cursor.execute("""
+                SELECT AVG(dependent_count) AS avg_dependents
+                FROM (
+                    SELECT COUNT(d.DependentID) AS dependent_count
+                    FROM dependent d
+                    JOIN employee e ON d.EmployeeID = e.EmployeeID
+                    WHERE TIMESTAMPDIFF(YEAR, e.BirthDate, CURDATE()) > 30
+                      AND d.Status = '正常'
+                    GROUP BY d.EmployeeID
+                ) AS subquery
+            """)
+            result = cursor.fetchone()
+            result = f"30歲以上員工的平均眷屬人數為 {result['avg_dependents']:.2f} 人。"
+
+    return render_template('statistics.html', result=result)
+
+
+    return render_template('statistics.html', result=result)
+@app.route('/statistics/query/continent', methods=['GET'])
+def query_continent():
+    # 獲取查詢參數
+    continent = request.args.get('continent')
+    cursor = db.cursor(dictionary=True)  # 修改為 dictionary 模式
+    # 執行 SQL 查詢
+    cursor.execute("""
+        SELECT COUNT(DISTINCT a.EmployeeID) AS EmployeeCount
+        FROM assignment a
+        JOIN country c ON a.CountryCode = c.CountryCode
+        WHERE c.Continent = %s AND a.Status = '正常'
+    """, (continent,))
+    result = cursor.fetchone()
+    # 返回查詢結果
+    if result and result['EmployeeCount'] is not None:
+        return render_template('statistics.html', result=f"派駐於 {continent} 洲的員工總數為 {result['EmployeeCount']} 人。")
+    else:
+        return render_template('statistics.html', result=f"查無派駐於 {continent} 洲的員工數據。")
 
 
 # 首頁

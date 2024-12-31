@@ -121,22 +121,22 @@ button.btn-danger:hover {
 form label {
     display: inline-block;
     font-weight: bold;
-    margin-bottom: 0; /* 去除下方空白 */
-    margin-right: 5px; /* 减少右侧空白 */
-    text-align: right; /* 确保标签文字对齐 */
-    width: auto; /* 保持自适应宽度 */
+    margin-bottom: 0;
+    margin-right: 5px;
+    text-align: right;
+    width: auto;
 }
 
 form input, form select {
     display: inline-block;
-    padding: 5px; /* 保持输入框内部间距 */
-    margin: 0; /* 去除输入框外部间距 */
+    padding: 5px;
+    margin: 0;
     border: 1px solid #444;
     border-radius: 5px;
     background-color: #333;
     color: #fff;
-    width: 250px; /* 保证宽度一致 */
-    box-sizing: border-box; /* 确保宽度包含内边距和边框 */
+    width: 250px;
+    box-sizing: border-box;
 }
 
 

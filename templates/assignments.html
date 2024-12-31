@@ -12,9 +12,12 @@
 
 <form method="POST">
     <label for="EmployeeID">員工身分證字號:</label>
-    <input type="text" id="EmployeeID" name="EmployeeID" required>
+    <select id="EmployeeID" name="EmployeeID" required>
+        <option value="">請選擇員工</option>
+        <!-- 選項將由JavaScript動態填充 -->
+    </select>
     <label for="EmployeeName">員工姓名:</label>
-    <input type="text" id="EmployeeName" name="EmployeeName" required>
+    <input type="text" id="EmployeeName" name="EmployeeName" readonly>
     <label for="CountryCode">派駐國家代碼:</label>
     <input type="text" id="CountryCode" name="CountryCode" required>
     <label for="StartDate">到職日期:</label>
@@ -63,9 +66,35 @@
                     <button type="submit" class="btn btn-danger">刪除</button>
                 </form>
             </td>
-
         </tr>
         {% endfor %}
     </tbody>
 </table>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const employeeSelect = document.getElementById('EmployeeID');
+        const employeeNameInput = document.getElementById('EmployeeName');
+
+        // 從後端獲取員工資料
+        fetch('/employees/options')
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(employee => {
+                    const option = document.createElement('option');
+                    option.value = employee.EmployeeID;
+                    option.textContent = `${employee.EmployeeID} - ${employee.Name}`;
+                    option.setAttribute('data-name', employee.Name);
+                    employeeSelect.appendChild(option);
+                });
+            });
+
+        // 選擇員工後，自動填充姓名
+        employeeSelect.addEventListener('change', function () {
+            const selectedOption = employeeSelect.options[employeeSelect.selectedIndex];
+            const name = selectedOption.getAttribute('data-name');
+            employeeNameInput.value = name || '';
+        });
+    });
+</script>
 {% endblock %}

@@ -5,7 +5,7 @@ db_config = {
     'user': 'root',
     'password': '0000',
     'database': 'testdb',
-    'port': 3307  # 確認端口號
+    'port': '3307'  # 確認端口號
 }
 
 try:

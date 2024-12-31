@@ -1,0 +1,47 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<h2>統計</h2>
+
+<!-- 查詢功能 -->
+<form method="POST">
+    <label for="query_type">選擇查詢類型：</label>
+    <select id="query_type" name="query_type">
+        <option value="country_30_above">派駐某一國家且30歲以上員工人數</option>
+        <option value="continent_employee_count">派駐某一洲員工總數</option>
+        <option value="average_dependent_age">30歲以上員工之平均眷屬年齡</option>
+        <option value="average_dependent_count">30歲以上員工之平均眷屬人數</option>
+    </select>
+
+    <div id="country_input" style="display: none;">
+        <label for="country">國家名稱：</label>
+        <input type="text" id="country" name="country">
+    </div>
+
+    <div id="continent_input" style="display: none;">
+        <label for="continent">洲名：</label>
+        <input type="text" id="continent" name="continent">
+    </div>
+
+    <button type="submit" class="btn btn-primary">查詢</button>
+</form>
+
+<!-- 查詢結果 -->
+{% if result %}
+<h3>查詢結果</h3>
+<p>{{ result }}</p>
+{% endif %}
+
+<script>
+    document.getElementById('query_type').addEventListener('change', function() {
+        document.getElementById('country_input').style.display = 'none';
+        document.getElementById('continent_input').style.display = 'none';
+
+        if (this.value === 'country_30_above') {
+            document.getElementById('country_input').style.display = 'block';
+        } else if (this.value === 'continent_employee_count') {
+            document.getElementById('continent_input').style.display = 'block';
+        }
+    });
+</script>
+{% endblock %}
