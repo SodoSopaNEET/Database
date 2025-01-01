@@ -25,7 +25,8 @@
     <label for="Status">狀態:</label>
     <select id="Status" name="Status" required>
         <option value="正常" {% if dependent.Status == '正常' %}selected{% endif %}>正常</option>
-        <option value="已刪除" {% if dependent.Status == '已刪除' %}selected{% endif %}>已刪除</option>
+        <option value="離婚" {% if dependent.Status == '離婚' %}selected{% endif %}>離婚</option>
+        <option value="被人收養" {% if dependent.Status == '被人收養' %}selected{% endif %}>被人收養</option>
     </select>
 
     <button type="submit" class="btn btn-primary">保存修改</button>

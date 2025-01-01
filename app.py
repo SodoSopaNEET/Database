@@ -252,8 +252,9 @@ def edit_dependent(employee_id, dependent_id):
         gender = request.form.get('Gender')
         relation = request.form.get('Relation')
         birth_date = request.form.get('BirthDate')
-        status = request.form.get('Status')
+        status = request.form.get('Status')  # 獲取新的狀態
 
+        # 更新資料庫中的記錄
         cursor.execute("""
             UPDATE dependent
             SET DependentName = %s, Gender = %s, Relation = %s, BirthDate = %s, Status = %s
@@ -268,8 +269,8 @@ def edit_dependent(employee_id, dependent_id):
     """, (employee_id, dependent_id))
     dependent = cursor.fetchone()
 
-    # 傳遞正確的變數名稱
     return render_template('edit_dependent.html', dependent=dependent)
+
 
 
 @app.route('/dependents/delete/<employee_id>/<dependent_id>', methods=['POST'])
