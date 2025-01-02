@@ -377,80 +377,128 @@ def statistics():
 
     if request.method == 'POST':
         query_type = request.form.get('query_type')
+        country = request.form.get('country')
+        continent = request.form.get('continent')
+        rank = request.form.get('rank')
+        is_ally = request.form.get('is_ally')
 
-        if query_type == 'country_30_above':
-            country = request.form.get('country')
-            cursor.execute("""
-                SELECT COUNT(*) AS employee_count
-                FROM employee e
-                JOIN assignment a ON e.EmployeeID = a.EmployeeID
-                WHERE a.CountryCode = (SELECT CountryCode FROM country WHERE CountryName = %s)
-                  AND TIMESTAMPDIFF(YEAR, e.BirthDate, CURDATE()) > 30
-                  AND a.Status = '正常'
-            """, (country,))
+        # 員工統計
+        if query_type == 'employee_count':
+            cursor.execute("SELECT COUNT(*) AS employee_count FROM employee WHERE Status='正常'")
             result = cursor.fetchone()
-            result = f"派駐於 {country} 且年齡超過30歲的員工人數為 {result['employee_count']} 人。"
+            result = f"員工總數為 {result['employee_count']} 人。"
 
-        elif query_type == 'continent_employee_count':
-            continent = request.form.get('continent')
+        elif query_type == 'employee_average_age_salary':
             cursor.execute("""
-                SELECT COUNT(DISTINCT a.EmployeeID) AS employee_count
-                FROM employee e
-                JOIN assignment a ON e.EmployeeID = a.EmployeeID
-                JOIN country c ON a.CountryCode = c.CountryCode
-                WHERE c.Continent = %s
-                  AND a.Status = '正常'
+                SELECT AVG(TIMESTAMPDIFF(YEAR, BirthDate, CURDATE())) AS avg_age,
+                       AVG(Salary) AS avg_salary
+                FROM employee
+                WHERE Status='正常'
+            """)
+            result = cursor.fetchone()
+            result = f"平均年齡為 {result['avg_age']:.2f} 歲，平均薪資為 {result['avg_salary']:.2f} 元。"
+
+        elif query_type == 'employee_rank_group':
+            cursor.execute("""
+                SELECT `Rank`, COUNT(*) AS rank_count
+                FROM employee
+                WHERE Status='正常'
+                GROUP BY `Rank`
+            """)
+            results = cursor.fetchall()
+            result = "依職等分群統計：<br>" + "<br>".join([f"{row['Rank']} 職等：{row['rank_count']} 人" for row in results])
+
+        elif query_type == 'employee_total_salary':
+            cursor.execute("""
+                SELECT SUM(Salary) AS total_salary,
+                       SUM(Salary) / 12 AS monthly_salary,
+                       SUM(Salary) / 52 AS weekly_salary
+                FROM employee
+                WHERE Status='正常'
+            """)
+            result = cursor.fetchone()
+            result = (f"全年總薪資為 {result['total_salary']:.2f} 元，"
+                      f"每月平均薪資為 {result['monthly_salary']:.2f} 元，"
+                      f"每周平均薪資為 {result['weekly_salary']:.2f} 元。")
+
+        # 國家統計
+        elif query_type == 'ally_count':
+            cursor.execute("""
+                SELECT SUM(IsAlly) AS ally_count, COUNT(*) - SUM(IsAlly) AS non_ally_count
+                FROM country
+            """)
+            result = cursor.fetchone()
+            result = f"邦交國共有 {result['ally_count']} 個，非邦交國共有 {result['non_ally_count']} 個。"
+
+        elif query_type == 'continent_ally':
+            cursor.execute("""
+                SELECT SUM(IsAlly) AS ally_count, COUNT(*) - SUM(IsAlly) AS non_ally_count
+                FROM country
+                WHERE Continent=%s
             """, (continent,))
             result = cursor.fetchone()
-            result = f"派駐於 {continent} 的員工總數為 {result['employee_count']} 人。"
+            result = f"{continent} 洲中邦交國共有 {result['ally_count']} 個，非邦交國共有 {result['non_ally_count']} 個。"
 
-        elif query_type == 'average_dependent_age':
+        elif query_type == 'population_by_ally':
+            if is_ally == '1':
+                cursor.execute("""
+                    SELECT SUM(Population) AS population
+                    FROM country
+                    WHERE IsAlly = 1
+                """)
+                result = cursor.fetchone()
+                result = f"所有邦交國的總國民人數為 {result['population']} 人。"
+            else:
+                cursor.execute("""
+                    SELECT SUM(Population) AS population
+                    FROM country
+                    WHERE IsAlly = 0
+                """)
+                result = cursor.fetchone()
+                result = f"所有非邦交國的總國民人數為 {result['population']} 人。"
+
+        # 派駐統計
+        elif query_type == 'country_employee_count':
             cursor.execute("""
-                SELECT AVG(TIMESTAMPDIFF(YEAR, d.BirthDate, CURDATE())) AS avg_age
-                FROM dependent d
-                JOIN employee e ON d.EmployeeID = e.EmployeeID
-                WHERE TIMESTAMPDIFF(YEAR, e.BirthDate, CURDATE()) > 30
-                  AND d.Status = '正常'
+                SELECT CountryName, COUNT(*) AS employee_count
+                FROM assignment a
+                JOIN country c ON a.CountryCode = c.CountryCode
+                WHERE a.Status='正常'
+                GROUP BY c.CountryName
+            """)
+            results = cursor.fetchall()
+            result = "每個國家派駐員工總數如下：<br>" + "<br>".join(
+                [f"{row['CountryName']}：{row['employee_count']} 人" for row in results])
+
+
+        # 眷屬統計
+        elif query_type == 'average_dependent_age_gender':
+            cursor.execute("""
+                SELECT AVG(TIMESTAMPDIFF(YEAR, BirthDate, CURDATE())) AS avg_age,
+                       AVG(CASE WHEN Gender='男' THEN TIMESTAMPDIFF(YEAR, BirthDate, CURDATE()) END) AS avg_male_age,
+                       AVG(CASE WHEN Gender='女' THEN TIMESTAMPDIFF(YEAR, BirthDate, CURDATE()) END) AS avg_female_age
+                FROM dependent
+                WHERE Status='正常'
             """)
             result = cursor.fetchone()
-            result = f"30歲以上員工的平均眷屬年齡為 {result['avg_age']:.2f} 歲。"
+            result = (f"眷屬平均年齡為 {result['avg_age']:.2f} 歲，"
+                      f"男眷屬平均年齡為 {result['avg_male_age']:.2f} 歲，"
+                      f"女眷屬平均年齡為 {result['avg_female_age']:.2f} 歲。")
 
-        elif query_type == 'average_dependent_count':
+        elif query_type == 'dependent_gender_count':
             cursor.execute("""
-                SELECT AVG(dependent_count) AS avg_dependents
-                FROM (
-                    SELECT COUNT(d.DependentID) AS dependent_count
-                    FROM dependent d
-                    JOIN employee e ON d.EmployeeID = e.EmployeeID
-                    WHERE TIMESTAMPDIFF(YEAR, e.BirthDate, CURDATE()) > 30
-                      AND d.Status = '正常'
-                    GROUP BY d.EmployeeID
-                ) AS subquery
+                SELECT SUM(Gender='男') AS male_count, SUM(Gender='女') AS female_count
+                FROM dependent
+                WHERE Status='正常'
             """)
             result = cursor.fetchone()
-            result = f"30歲以上員工的平均眷屬人數為 {result['avg_dependents']:.2f} 人。"
+            result = (f"男眷屬人數為 {result['male_count']} 人，"
+                      f"女眷屬人數為 {result['female_count']} 人。")
 
     return render_template('statistics.html', result=result)
 
 
-@app.route('/statistics/query/continent', methods=['GET'])
-def query_continent():
-    # 獲取查詢參數
-    continent = request.args.get('continent')
-    cursor = db.cursor(dictionary=True)  # 修改為 dictionary 模式
-    # 執行 SQL 查詢
-    cursor.execute("""
-        SELECT COUNT(DISTINCT a.EmployeeID) AS EmployeeCount
-        FROM assignment a
-        JOIN country c ON a.CountryCode = c.CountryCode
-        WHERE c.Continent = %s AND a.Status = '正常'
-    """, (continent,))
-    result = cursor.fetchone()
-    # 返回查詢結果
-    if result and result['EmployeeCount'] is not None:
-        return render_template('statistics.html', result=f"派駐於 {continent} 的員工總數為 {result['EmployeeCount']} 人。")
-    else:
-        return render_template('statistics.html', result=f"查無派駐於 {continent} 的員工數據。")
+
 
 
 # 首頁

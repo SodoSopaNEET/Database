@@ -1,16 +1,21 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-<h2>跨資料表整合</h2>
+<h2>跨資料表整合與統計</h2>
 
-<!-- 查詢功能 -->
 <form method="POST">
     <label for="query_type">選擇查詢類型：</label>
     <select id="query_type" name="query_type">
-        <option value="country_30_above">派駐某一國家且30歲以上員工人數</option>
-        <option value="continent_employee_count">派駐某一洲員工總數</option>
-        <option value="average_dependent_age">30歲以上員工之平均眷屬年齡</option>
-        <option value="average_dependent_count">30歲以上員工之平均眷屬人數</option>
+        <option value="employee_count">員工總人數</option>
+        <option value="employee_average_age_salary">員工平均年齡與薪資</option>
+        <option value="employee_rank_group">依職等分群之統計</option>
+        <option value="employee_total_salary">員工全年、每月與每周總薪資</option>
+        <option value="ally_count">邦交國與非邦交國總數</option>
+        <option value="continent_ally">某一洲邦交國與非邦交國總數</option>
+        <option value="population_by_ally">邦交國或非邦交國之國民人數</option>
+        <option value="country_employee_count">每一國家派駐之總員工人數</option>
+        <option value="average_dependent_age_gender">平均眷屬年齡與性別分布</option>
+        <option value="dependent_gender_count">男生與女生眷屬人數</option>
     </select>
 
     <div id="country_input" style="display: none;">
@@ -23,25 +28,43 @@
         <input type="text" id="continent" name="continent">
     </div>
 
+    <div id="ally_input" style="display: none;">
+        <label for="is_ally">邦交國類型：</label>
+        <select id="is_ally" name="is_ally">
+            <option value="1">邦交國</option>
+            <option value="0">非邦交國</option>
+        </select>
+    </div>
+
     <button type="submit" class="btn btn-primary">查詢</button>
 </form>
 
-<!-- 查詢結果 -->
 {% if result %}
 <h3>查詢結果</h3>
-<p>{{ result }}</p>
+<p>{{ result|safe }}</p>
 {% endif %}
 
 <script>
-    document.getElementById('query_type').addEventListener('change', function() {
-        document.getElementById('country_input').style.display = 'none';
-        document.getElementById('continent_input').style.display = 'none';
+    const queryTypeSelector = document.getElementById('query_type');
+    const countryInput = document.getElementById('country_input');
+    const continentInput = document.getElementById('continent_input');
+    const allyInput = document.getElementById('ally_input');
 
-        if (this.value === 'country_30_above') {
-            document.getElementById('country_input').style.display = 'block';
-        } else if (this.value === 'continent_employee_count') {
-            document.getElementById('continent_input').style.display = 'block';
+    queryTypeSelector.addEventListener('change', function () {
+        // 隱藏所有輸入框
+        countryInput.style.display = 'none';
+        continentInput.style.display = 'none';
+        allyInput.style.display = 'none';
+
+        // 根據選擇的查詢類型顯示對應的輸入框
+        if (this.value === 'population_by_ally') {
+            allyInput.style.display = 'block';
+        } else if (this.value === 'continent_ally' || this.value === 'continent_employee_count') {
+            continentInput.style.display = 'block';
+        } else if (this.value === 'country_30_above') {
+            countryInput.style.display = 'block';
         }
     });
 </script>
+
 {% endblock %}
